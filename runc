@@ -167,6 +167,14 @@ func main() {
 
 
 """,
+        "rust": """
+
+fn main() {
+
+
+}
+
+        """,
         "typescript":
         """import fs from "fs";
 import path from "path";
@@ -187,20 +195,23 @@ import path from "path";
         "haskell":    {"runner": partial(_runFile, "runghc"), "extension": ".hs", "req": ["ghc", "runghc"], "snippet": _snippets["haskell"]},
         "java":       {"runner": partial(_runFile, "java"), "extension": ".java", "req": ["java"], "snippet": _snippets["java"]},
         "javascript": {"runner": partial(_runFile, "node"), "extension": ".js", "req": ["node"], "snippet": _snippets["javascript"]},
+        "lua":        {"runner": partial(_runFile, "lua"), "extension": ".lua", "req": ["lua"], "snippet": _NO_SNIP},
         "python":     {"runner": partial(_runFile, "python"), "extension": ".py", "req": ["python"], "snippet": _snippets["python"]},
         "ruby":       {"runner": partial(_runFile, "ruby"), "extension": ".rb", "req": ["ruby"], "snippet": _NO_SNIP},
+        "rust":       {"runner": partial(_runGCC, "rustc", ["-o"]), "extension": ".rs", "req": ["rustc"], "snippet": _snippets["rust"]},
         "sh":         {"runner": partial(_runFile, "sh"), "extension": ".sh", "req": ["sh"], "snippet": _NO_SNIP},
         "typescript": {"runner": partial(_runFile, "ts-node"), "extension": ".ts", "req": ["ts-node"], "snippet": _snippets["typescript"]},
         "zsh":        {"runner": partial(_runFile, "zsh"), "extension": ".zsh", "req": ["zsh"], "snippet": _NO_SNIP},
     }
     _aliases = {
-        "cplusplus": "c++",
         "cpp": "c++",
         "cxx": "c++",
+        "cs": "c#",
         "hs": "haskell",
         "js": "javascript",
         "py": "python",
         "rb": "ruby",
+        "rs": "rust",
         "ts": "typescript",
     }
 
@@ -292,7 +303,8 @@ def main(args: argparse.Namespace) -> int:
         return ExitCode.OK
     elif args.aliases:
         print("Avaliable aliases:\n___________________")
-        list(map(lambda a: print(str(a[0]).rjust(10), ':', str(a[1]).ljust(10)), Runner._aliases.items()))
+        list(map(lambda a: print(str(a[0]).rjust(10), ':', str(
+            a[1]).ljust(10)), Runner._aliases.items()))
         return ExitCode.OK
     print("Bad args. try '-h/--help'")
     return ExitCode.ARGUMENT_ERROR
