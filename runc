@@ -181,6 +181,11 @@ fn main() {
 }
 
         """,
+        "scheme": """(begin
+
+
+ )
+ """,
         "typescript":
         """import fs from "fs";
 import path from "path";
@@ -207,6 +212,7 @@ import path from "path";
         "ruby":       {"runner": partial(_runFile, "ruby"), "extension": ".rb", "req": ["ruby"], "snippet": _NO_SNIP},
         "rust":       {"runner": partial(_runGCC, "rustc", ["-o"]), "extension": ".rs", "req": ["rustc"], "snippet": _snippets["rust"]},
         "sh":         {"runner": partial(_runFile, "sh"), "extension": ".sh", "req": ["sh"], "snippet": _NO_SNIP},
+        "scheme":      {"runner": partial(_runFile, "guile"), "extension": ".scm", "req": ["guile"], "snippet": _snippets["scheme"]},
         "typescript": {"runner": partial(_runFile, "ts-node"), "extension": ".ts", "req": ["ts-node"], "snippet": _snippets["typescript"]},
         "zsh":        {"runner": partial(_runFile, "zsh"), "extension": ".zsh", "req": ["zsh"], "snippet": _NO_SNIP},
     }
@@ -219,6 +225,7 @@ import path from "path";
         "py": "python",
         "rb": "ruby",
         "rs": "rust",
+        "scm": "scheme",
         "ts": "typescript",
     }
 

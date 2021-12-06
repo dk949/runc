@@ -44,5 +44,5 @@ Most languages came from
 | :ballot_box_with_check: | Ruby       | :hammer: | R            |                 |           | :no_entry: | SystemVerilog     |
 | :ballot_box_with_check: | Rust       | :hammer: | Scala        |                 |           | :no_entry: | Visual Basic .NET |
 | :ballot_box_with_check: | Shell      | :hammer: | Vala         |                 |           | :no_entry: | TSQL              |
-| :ballot_box_with_check: | TypeScript | :hammer: | Vim script   |                 |           |            |                   |
-|                         |            | :hammer: | WebAssembly  |                 |           |            |                   |
+| :ballot_box_with_check: | Scheme     | :hammer: | Vim script   |                 |           |            |                   |
+| :ballot_box_with_check: | TypeScript | :hammer: | WebAssembly  |                 |           |            |                   |
