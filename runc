@@ -13,6 +13,7 @@ import shutil
 class ExitCode(IntEnum):
     INTERNAL_ERROR = -1
     OK = auto()
+    ARGUMENT_ERROR = auto()
     LANGUAGE_ERROR = auto()
     EDITOR_ERROR = auto()
     FILE_ERROR = auto()
@@ -282,27 +283,43 @@ import path from "path";
         print(r.stdout.decode('utf8'))
 
 
-def main(lang: Optional[str]) -> int:
-    return Runner(lang).ret
+def main(args: argparse.Namespace) -> int:
+    if args.lang:
+        return Runner(args.lang).ret
+    elif args.ls:
+        print("Avaliable language:\n___________________")
+        list(map(partial(print, "   "), Runner._langs))
+        return ExitCode.OK
+    elif args.aliases:
+        print("Avaliable aliases:\n___________________")
+        list(map(lambda a: print(str(a[0]).rjust(10), ':', str(a[1]).ljust(10)), Runner._aliases.items()))
+        return ExitCode.OK
+    print("Bad args. try '-h/--help'")
+    return ExitCode.ARGUMENT_ERROR
 
 
 def genEpilog() -> str:
     out = ["Exit codes:"]
     for c in ExitCode:
-        out.append(f"{' ' * (7 if c.value < 0 or  c.value > 9 else 8)}{c.value} : {c.name}")
+        out.append(
+            f"{' ' * (7 if c.value < 0 or  c.value > 9 else 8)}{c.value} : {c.name}")
     out.append(' ')
-
 
     return '\n'.join(out)
 
 
-def parseArgs() -> Optional[str]:
-    parser = argparse.ArgumentParser(prog="runc", description="Open the EDITOR. Write some code. Have it executed.",
-                                     epilog=genEpilog(), formatter_class=argparse.RawDescriptionHelpFormatter)
+def parseArgs() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(prog="runc", description="Open the EDITOR. Write some code. Have it executed.", epilog=genEpilog(),
+                                     formatter_class=argparse.RawDescriptionHelpFormatter, exit_on_error=False)
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('lang', metavar='LANG', nargs='?',
+                       help='language to be ran', default=None)
+    group.add_argument('--ls', '-l', action="store_true",
+                       help="list available languages")
+    group.add_argument('--aliases', '-a', action="store_true",
+                       help="list available languages")
 
-    parser.add_argument('lang', metavar='LANG', type=str,
-                        nargs=1, help='language to be ran')
-    return parser.parse_args().lang
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
