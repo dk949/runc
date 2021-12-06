@@ -286,11 +286,22 @@ def main(lang: Optional[str]) -> int:
     return Runner(lang).ret
 
 
+def genEpilog() -> str:
+    out = ["Exit codes:"]
+    for c in ExitCode:
+        out.append(f"{' ' * (7 if c.value < 0 or  c.value > 9 else 8)}{c.value} : {c.name}")
+    out.append(' ')
+
+
+    return '\n'.join(out)
+
+
 def parseArgs() -> Optional[str]:
-    parser = argparse.ArgumentParser(description='run code.')
+    parser = argparse.ArgumentParser(prog="runc", description="Open the EDITOR. Write some code. Have it executed.",
+                                     epilog=genEpilog(), formatter_class=argparse.RawDescriptionHelpFormatter)
+
     parser.add_argument('lang', metavar='LANG', type=str,
-                        nargs='?', help='language to be ran')
-    # maybe more args later idk
+                        nargs=1, help='language to be ran')
     return parser.parse_args().lang
 
 
