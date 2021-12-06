@@ -36,13 +36,13 @@ Most languages came from
 | :ballot_box_with_check: | D          | :hammer: | Elm          | :man_shrugging: | Erlang    | :no_entry: | MATLAB            |
 | :ballot_box_with_check: | Go         | :hammer: | Fortran      | :man_shrugging: | Julia     | :no_entry: | NASL              |
 | :ballot_box_with_check: | Haskell    | :hammer: | Groovy       | :man_shrugging: | Smalltalk | :no_entry: | Nix               |
-| :ballot_box_with_check: | Java       | :hammer: | Kotlin       | :man_shrugging: | TSQL      | :no_entry: | Objective-C       |
+| :ballot_box_with_check: | Java       | :hammer: | Kotlin       | :man_shrugging: | Crystal   | :no_entry: | Objective-C       |
 | :ballot_box_with_check: | JavaScript | :hammer: | OCaml        |                 |           | :no_entry: | Objective-C++     |
 | :ballot_box_with_check: | Lua        | :hammer: | PHP          |                 |           | :no_entry: | Puppet            |
 | :ballot_box_with_check: | Perl       | :hammer: | PowerShell   |                 |           | :no_entry: | Roff              |
 | :ballot_box_with_check: | Python     | :hammer: | PureScript   |                 |           | :no_entry: | Swift             |
 | :ballot_box_with_check: | Ruby       | :hammer: | R            |                 |           | :no_entry: | SystemVerilog     |
 | :ballot_box_with_check: | Rust       | :hammer: | Scala        |                 |           | :no_entry: | Visual Basic .NET |
-| :ballot_box_with_check: | Shell      | :hammer: | Vala         |                 |           |            |                   |
+| :ballot_box_with_check: | Shell      | :hammer: | Vala         |                 |           | :no_entry: | TSQL              |
 | :ballot_box_with_check: | TypeScript | :hammer: | Vim script   |                 |           |            |                   |
 |                         |            | :hammer: | WebAssembly  |                 |           |            |                   |
