@@ -162,6 +162,12 @@ func main() {
 
 }
 """,
+        "perl":
+        """use warnings;
+use strict;
+
+
+""",
         "python":
         """import sys, math, time, random
 
@@ -196,6 +202,7 @@ import path from "path";
         "java":       {"runner": partial(_runFile, "java"), "extension": ".java", "req": ["java"], "snippet": _snippets["java"]},
         "javascript": {"runner": partial(_runFile, "node"), "extension": ".js", "req": ["node"], "snippet": _snippets["javascript"]},
         "lua":        {"runner": partial(_runFile, "lua"), "extension": ".lua", "req": ["lua"], "snippet": _NO_SNIP},
+        "perl":       {"runner": partial(_runFile, "perl"), "extension": ".pl", "req": ["perl"], "snippet": _snippets["perl"]},
         "python":     {"runner": partial(_runFile, "python"), "extension": ".py", "req": ["python"], "snippet": _snippets["python"]},
         "ruby":       {"runner": partial(_runFile, "ruby"), "extension": ".rb", "req": ["ruby"], "snippet": _NO_SNIP},
         "rust":       {"runner": partial(_runGCC, "rustc", ["-o"]), "extension": ".rs", "req": ["rustc"], "snippet": _snippets["rust"]},
