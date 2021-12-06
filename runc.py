@@ -1,9 +1,12 @@
-import argparse
+#!/usr/bin/python3.9
+from enum import IntEnum, auto
 from typing import Callable, Optional, TypedDict
+
+import argparse
 import os
 import subprocess as sp
+import sys
 import tempfile
-from enum import IntEnum, auto
 
 
 def _runPython(file: str, _: list[str]) -> sp.CompletedProcess[bytes]:
@@ -20,13 +23,23 @@ def _runC(file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
     return sp.run("/tmp/a.out", stdout=sp.PIPE, stderr=sp.PIPE)
 
 
+class ExitCode(IntEnum):
+    INTERNAL_ERROR = -1
+    OK = auto()
+    LANGUAGE_ERROR = auto()
+    EDITOR_ERROR = auto()
+    FILE_ERROR = auto()
+    CODE_ERROR = auto()
+
+
+class RunException(Exception):
+    def __init__(self, errorCode: ExitCode, msg: str) -> None:
+        super().__init__(errorCode, msg)
+        self.errorCode = errorCode
+        self.msg = msg
+
+
 class Runner:
-    class ExitCode(IntEnum):
-        INTERNAL_ERROR = -1
-        OK = auto()
-        UNSUPPORTED_LANGAUGE_ERROR = auto()
-        EDITOR_ERROR = auto()
-        FILE_ERROR = auto()
 
     class LangT(TypedDict):
         runner: Callable[[str, list[str]], sp.CompletedProcess]
@@ -51,31 +64,37 @@ class Runner:
 
     def _getLang(self, lang: Optional[str]) -> str:
         if not lang:
-            raise Exception("Language has to be specified")
+            raise RunException(ExitCode.LANGUAGE_ERROR,
+                               "Language has to be specified")
         if lang not in self._langs:
-            raise Exception("Unsupported language")
+            raise RunException(ExitCode.LANGUAGE_ERROR,
+                               "Unsupported language")
         return lang
 
     def _getEditor(self) -> str:
         if "EDITOR" not in os.environ:
-            raise Exception(
-                "Could not determine editor. Try setting EDITOR environment variable.")
+            raise RunException(ExitCode.EDITOR_ERROR,
+                               "Could not determine editor. Try setting EDITOR environment variable.")
         return os.environ["EDITOR"]
 
     def _openEditor(self) -> str:
         f = self._makeFile()
         r = sp.run([self._editor, f])
         if r.returncode != 0:
-            raise Exception(
-                f"Failed to run the editor. Command {r.args} failed with {r.returncode}:\n\t{r.stderr.decode('utf8')}")
+            raise RunException(ExitCode.EDITOR_ERROR,
+                               f"Failed to run the editor. Command {r.args} failed with {r.returncode}:\n\t{r.stderr.decode('utf8')}")
         return f
 
     def __init__(self, lang: Optional[str]) -> None:
-        self.ret = self.ExitCode.OK
-        self._lang = self._getLang(lang)
-        self._editor = self._getEditor()
-        self._file = self._openEditor()
-        self.run()
+        try:
+            self.ret = ExitCode.OK
+            self._lang = self._getLang(lang)
+            self._editor = self._getEditor()
+            self._file = self._openEditor()
+            self.run()
+        except RunException as re:
+            print(re.msg, file=sys.stderr)
+            self.ret = re.errorCode
 
     def __del__(self) -> None:
         for file in self._usedFiles:
@@ -84,8 +103,9 @@ class Runner:
     def run(self) -> None:
         r = self._langs[self._lang]["runner"](self._file, self._usedFiles)
         if r.returncode != 0:
-            raise Exception(
-                f"Command {r.args} failed with {r.returncode}:\n\t{r.stderr.decode('utf8')}")
+            raise RunException(ExitCode.CODE_ERROR,
+                               f"Command {r.args} failed with {r.returncode}:\n\t{r.stderr.decode('utf8')}")
+
         print(r.stdout.decode('utf8'))
 
 
@@ -106,4 +126,4 @@ if __name__ == "__main__":
         exit(main(parseArgs()))
     except Exception as e:
         print("Unexpected exception occurred:", e)
-        exit(Runner.ExitCode.INTERNAL_ERROR)
+        exit(ExitCode.INTERNAL_ERROR)
