@@ -1,26 +1,13 @@
 #!/usr/bin/python3.9
 from enum import IntEnum, auto
-from typing import Callable, Optional, TypedDict
-
+from functools import partial
+from typing import Callable, Optional, TypedDict, Final, Union
 import argparse
 import os
 import subprocess as sp
 import sys
 import tempfile
-
-
-def _runPython(file: str, _: list[str]) -> sp.CompletedProcess[bytes]:
-    return sp.run(["python", file], stdout=sp.PIPE, stderr=sp.PIPE)
-
-
-def _runC(file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
-    outfile = "/tmp/a.out"
-    usedFiles.append(outfile)
-    r = sp.run(
-        ["gcc", file, "-O3", "-o", outfile], stdout=sp.PIPE, stderr=sp.PIPE)
-    if r.returncode != 0:
-        return r
-    return sp.run("/tmp/a.out", stdout=sp.PIPE, stderr=sp.PIPE)
+import shutil
 
 
 class ExitCode(IntEnum):
@@ -29,6 +16,7 @@ class ExitCode(IntEnum):
     LANGUAGE_ERROR = auto()
     EDITOR_ERROR = auto()
     FILE_ERROR = auto()
+    RUNNER_ERROR = auto()
     CODE_ERROR = auto()
 
 
@@ -39,19 +27,182 @@ class RunException(Exception):
         self.msg = msg
 
 
+def _runFile(program: Union[str, list[str]], file: str, _: list[str]) -> sp.CompletedProcess[bytes]:
+    if isinstance(program, str):
+        return sp.run([program, file], stdout=sp.PIPE, stderr=sp.PIPE)
+    else:
+        return sp.run(program + [file], stdout=sp.PIPE, stderr=sp.PIPE)
+
+
+def _runGCC(compiler: str, opts: list[str], file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
+    outfile = "/tmp/a.out"
+    usedFiles.append(outfile)
+    r = sp.run([compiler] + opts + [outfile, file],
+               stdout=sp.PIPE, stderr=sp.PIPE)
+    if r.returncode != 0:
+        return r
+    return sp.run(outfile, stdout=sp.PIPE, stderr=sp.PIPE)
+
+
+def _runCSC(compiler: str, opts: list[str], program: str, file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
+    outfile = "/tmp/a.out"
+    usedFiles.append(outfile)
+    opts.append(f"/out:{outfile}")
+    r = sp.run([compiler] + opts + [file],
+               stdout=sp.PIPE, stderr=sp.PIPE)
+    if r.returncode != 0:
+        return r
+    return sp.run([program, outfile], stdout=sp.PIPE, stderr=sp.PIPE)
+
+
 class Runner:
 
     class LangT(TypedDict):
+        # Use the second parameter to store the list of files used by the runner.
+        # Append to the list to have the files automatically deleted at the end of the run
         runner: Callable[[str, list[str]], sp.CompletedProcess]
+
+        # has to include the dot. e.g '.py' not 'py'
         extension: str
+
+        # list of executables that have to be present in order to run the program
+        req: list[str]
+
+        # starting point for a program
+        snippet: str
 
     LangsT = dict[str, LangT]
 
+    _NO_SNIP: Final[str] = """
+
+
+"""
+    _NO_PROGRAM: Final[None] = None
+
+    _snippets: dict[str, str] = {
+        "c":
+        """#include <stdio.h>
+#include <math.h>
+
+int main(int argc, const char **argv) {
+
+
+    return 0;
+}
+""",
+        "c++":
+        """#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cmath>
+
+
+int main(int argc, const char **argv) {
+
+
+    return 0;
+}
+""",
+        "c#":
+        """using System;
+
+namespace Runc {
+    class Runner {
+        static void Main(string[] args) {
+
+
+        }
+    }
+}
+""",
+        "d":
+        """import std.stdio, std.range, std.algorithm;
+
+int main(){
+
+
+    return 0;
+}
+""",
+        "haskell":
+        """module Main where
+
+
+main :: IO ()
+main = undefined
+
+
+""",
+        "java":
+        """
+class Runc {
+
+    public static void main(String[] args){
+
+    }
+
+}
+""",
+        "javascript":
+        """const fs = require("fs");
+const process = require("process");
+
+
+
+""",
+        "go":
+        """package main
+import "fmt"
+
+
+func main() {
+
+
+}
+""",
+        "python":
+        """import sys, math, time, random
+
+
+""",
+        "typescript":
+        """import fs from "fs";
+import path from "path";
+
+
+""",
+    }
+
     _lang: str
     _langs: LangsT = {
-        "python": {"runner": _runPython, "extension": ".py"},
-        "c": {"runner": _runC, "extension": ".c"}
+        "bash":       {"runner": partial(_runFile, "bash"), "extension": ".bash", "req": ["bash"], "snippet": _NO_SNIP},
+        "c":          {"runner": partial(_runGCC, "gcc", ["-lm", "-Og", "-o"]), "extension": ".c", "req": ["gcc"], "snippet": _snippets["c"]},
+        "c++":        {"runner": partial(_runGCC, "g++", ["-lm", "-Og", "-o"]), "extension": ".cpp", "req": ["g++"], "snippet": _snippets["c++"]},
+        "c#":         {"runner": partial(_runCSC, "csc", ["/target:exe"], "mono"), "extension": ".cs", "req": ["mono", "csc"], "snippet": _snippets["c#"]},
+        "d":          {"runner": partial(_runFile, "rdmd"), "extension": ".d", "req": ["dmd", "rdmd"], "snippet": _snippets["d"]},
+        "dash":       {"runner": partial(_runFile, "dash"), "extension": ".dash", "req": ["dash"], "snippet": _NO_SNIP},
+        "go":         {"runner": partial(_runFile, ["go", "run"]), "extension": ".go", "req": ["go"], "snippet": _snippets["go"]},
+        "haskell":    {"runner": partial(_runFile, "runghc"), "extension": ".hs", "req": ["ghc", "runghc"], "snippet": _snippets["haskell"]},
+        "java":       {"runner": partial(_runFile, "java"), "extension": ".java", "req": ["java"], "snippet": _snippets["java"]},
+        "javascript": {"runner": partial(_runFile, "node"), "extension": ".js", "req": ["node"], "snippet": _snippets["javascript"]},
+        "python":     {"runner": partial(_runFile, "python"), "extension": ".py", "req": ["python"], "snippet": _snippets["python"]},
+        "ruby":       {"runner": partial(_runFile, "ruby"), "extension": ".rb", "req": ["ruby"], "snippet": _NO_SNIP},
+        "sh":         {"runner": partial(_runFile, "sh"), "extension": ".sh", "req": ["sh"], "snippet": _NO_SNIP},
+        "typescript": {"runner": partial(_runFile, "ts-node"), "extension": ".ts", "req": ["ts-node"], "snippet": _snippets["typescript"]},
+        "zsh":        {"runner": partial(_runFile, "zsh"), "extension": ".zsh", "req": ["zsh"], "snippet": _NO_SNIP},
     }
+    _aliases = {
+        "cplusplus": "c++",
+        "cpp": "c++",
+        "cxx": "c++",
+        "hs": "haskell",
+        "js": "javascript",
+        "py": "python",
+        "rb": "ruby",
+        "ts": "typescript",
+    }
+
     _editor: str
     _file: str
     _usedFiles: list[str] = []
@@ -60,16 +211,38 @@ class Runner:
     def _makeFile(self) -> str:
         with open(os.path.join(tempfile.gettempdir(), f"runc_runner{self._langs[self._lang]['extension']}"), "w") as f:
             self._usedFiles.append(f.name)
+            f.write(self._langs[self._lang]["snippet"])
             return f.name
+
+    def _getFailedReq(self, lang: str) -> list[str]:
+        return list(
+            map(lambda x: x[1],
+                filter(lambda x: not x[0],
+                       ((shutil.which(l), l)
+                        for l in self._langs[lang]["req"])
+                       )
+                )
+        )
 
     def _getLang(self, lang: Optional[str]) -> str:
         if not lang:
             raise RunException(ExitCode.LANGUAGE_ERROR,
                                "Language has to be specified")
-        if lang not in self._langs:
-            raise RunException(ExitCode.LANGUAGE_ERROR,
-                               "Unsupported language")
-        return lang
+
+        lang = lang.lower()
+
+        if lang in self._aliases:
+            lang = self._aliases[lang]
+
+        if lang in self._langs:
+            r = self._getFailedReq(lang)
+            if r:
+                raise RunException(ExitCode.RUNNER_ERROR,
+                                   f"could not fulfil all the requirements. Missing: {r}")
+            return lang
+
+        raise RunException(ExitCode.LANGUAGE_ERROR,
+                           f"Unsupported language: {lang}")
 
     def _getEditor(self) -> str:
         if "EDITOR" not in os.environ:
@@ -82,7 +255,7 @@ class Runner:
         r = sp.run([self._editor, f])
         if r.returncode != 0:
             raise RunException(ExitCode.EDITOR_ERROR,
-                               f"Failed to run the editor. Command {r.args} failed with {r.returncode}:\n\t{r.stderr.decode('utf8')}")
+                               f"Failed to run the editor. Command {r.args} failed with {r.returncode}:\n\n{r.stderr.decode('utf8')}")
         return f
 
     def __init__(self, lang: Optional[str]) -> None:
@@ -98,13 +271,13 @@ class Runner:
 
     def __del__(self) -> None:
         for file in self._usedFiles:
-            os.remove(file)
+            (os.path.exists(file) and os.remove(file))
 
     def run(self) -> None:
         r = self._langs[self._lang]["runner"](self._file, self._usedFiles)
         if r.returncode != 0:
             raise RunException(ExitCode.CODE_ERROR,
-                               f"Command {r.args} failed with {r.returncode}:\n\t{r.stderr.decode('utf8')}")
+                               f"Command {r.args} failed with {r.returncode}:\n\n{r.stderr.decode('utf8')}")
 
         print(r.stdout.decode('utf8'))
 
