@@ -201,9 +201,9 @@ import path from "path";
                             self._langs[self._lang]["extension"])
         return hist
 
-    def _loadHist(self) -> str:
+    def _loadHist(self, newHist: bool) -> str:
         emptyCache = self._snippets.get(self._lang) or self._NO_SNIP
-        if not (hist := self._getHistFile()):
+        if not (hist := self._getHistFile()) or newHist:
             return emptyCache
 
         if os.path.exists(hist):
@@ -259,10 +259,10 @@ import path from "path";
     _cacheDir: Optional[str]
     ret: ExitCode
 
-    def _makeFile(self) -> str:
+    def _makeFile(self, newHist: bool) -> str:
         with open(os.path.join(tempfile.gettempdir(), f"runc_runner{self._langs[self._lang]['extension']}"), "w") as f:
             self._usedFiles.append(f.name)
-            f.write(self._loadHist())
+            f.write(self._loadHist(newHist))
             return f.name
 
     def _getFailedReq(self, lang: str) -> list[str]:
@@ -301,8 +301,8 @@ import path from "path";
                                "Could not determine editor. Try setting EDITOR environment variable.")
         return os.environ["EDITOR"]
 
-    def _openEditor(self) -> str:
-        f = self._makeFile()
+    def _openEditor(self, newHist: bool) -> str:
+        f = self._makeFile(newHist)
         r = sp.run([self._editor, f])
         if r.returncode != 0:
             raise RunException(ExitCode.EDITOR_ERROR,
@@ -324,13 +324,13 @@ import path from "path";
 
         return None
 
-    def __init__(self, lang: Optional[str]) -> None:
+    def __init__(self, lang: Optional[str], noHist: bool, newHist: bool) -> None:
         try:
             self.ret = ExitCode.OK
-            self._cacheDir = self._getCacheDir()
+            self._cacheDir = None if noHist else self._getCacheDir()
             self._lang = self._getLang(lang)
             self._editor = self._getEditor()
-            self._file = self._openEditor()
+            self._file = self._openEditor(newHist)
             self._storeHist()
             self.run()
         except RunException as re:
@@ -358,7 +358,7 @@ import path from "path";
 
 def main(args: argparse.Namespace) -> int:
     if args.lang:
-        return Runner(args.lang).ret
+        return Runner(args.lang, args.noHist, args.newHist).ret
     elif args.ls:
         print("Avaliable language:\n___________________")
         list(map(partial(print, "   "), Runner._langs))
@@ -385,6 +385,10 @@ def genEpilog() -> str:
 def parseArgs() -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="runc", description="Open the EDITOR. Write some code. Have it executed.", epilog=genEpilog(),
                                      formatter_class=argparse.RawDescriptionHelpFormatter, exit_on_error=False)
+    parser.add_argument('--temp', '-t', dest='noHist', action='store_true',
+                        help='ignore history and use default snippet')
+    parser.add_argument('--new-history', '-n', dest='newHist', action='store_true',
+                        help='reset current language history to default')
     group = parser.add_mutually_exclusive_group()
     group.add_argument('lang', metavar='LANG', nargs='?',
                        help='language to be ran', default=None)
