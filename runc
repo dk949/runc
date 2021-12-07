@@ -69,9 +69,6 @@ class Runner:
         # list of executables that have to be present in order to run the program
         req: list[str]
 
-        # starting point for a program
-        snippet: str
-
     LangsT = dict[str, LangT]
 
     _NO_SNIP: Final[str] = """
@@ -195,27 +192,30 @@ import path from "path";
 """,
     }
 
+    def _loadHist(self, id: str) -> str:
+        return self._snippets.get(id) or self._NO_SNIP
+
     _lang: str
     _langs: LangsT = {
-        "bash":       {"runner": partial(_runFile, "bash"), "extension": ".bash", "req": ["bash"], "snippet": _NO_SNIP},
-        "c":          {"runner": partial(_runGCC, "gcc", ["-lm", "-Og", "-o"]), "extension": ".c", "req": ["gcc"], "snippet": _snippets["c"]},
-        "c++":        {"runner": partial(_runGCC, "g++", ["-lm", "-Og", "-o"]), "extension": ".cpp", "req": ["g++"], "snippet": _snippets["c++"]},
-        "c#":         {"runner": partial(_runCSC, "csc", ["/target:exe"], "mono"), "extension": ".cs", "req": ["mono", "csc"], "snippet": _snippets["c#"]},
-        "d":          {"runner": partial(_runFile, "rdmd"), "extension": ".d", "req": ["dmd", "rdmd"], "snippet": _snippets["d"]},
-        "dash":       {"runner": partial(_runFile, "dash"), "extension": ".dash", "req": ["dash"], "snippet": _NO_SNIP},
-        "go":         {"runner": partial(_runFile, ["go", "run"]), "extension": ".go", "req": ["go"], "snippet": _snippets["go"]},
-        "haskell":    {"runner": partial(_runFile, "runghc"), "extension": ".hs", "req": ["ghc", "runghc"], "snippet": _snippets["haskell"]},
-        "java":       {"runner": partial(_runFile, "java"), "extension": ".java", "req": ["java"], "snippet": _snippets["java"]},
-        "javascript": {"runner": partial(_runFile, "node"), "extension": ".js", "req": ["node"], "snippet": _snippets["javascript"]},
-        "lua":        {"runner": partial(_runFile, "lua"), "extension": ".lua", "req": ["lua"], "snippet": _NO_SNIP},
-        "perl":       {"runner": partial(_runFile, "perl"), "extension": ".pl", "req": ["perl"], "snippet": _snippets["perl"]},
-        "python":     {"runner": partial(_runFile, "python"), "extension": ".py", "req": ["python"], "snippet": _snippets["python"]},
-        "ruby":       {"runner": partial(_runFile, "ruby"), "extension": ".rb", "req": ["ruby"], "snippet": _NO_SNIP},
-        "rust":       {"runner": partial(_runGCC, "rustc", ["-o"]), "extension": ".rs", "req": ["rustc"], "snippet": _snippets["rust"]},
-        "sh":         {"runner": partial(_runFile, "sh"), "extension": ".sh", "req": ["sh"], "snippet": _NO_SNIP},
-        "scheme":      {"runner": partial(_runFile, "guile"), "extension": ".scm", "req": ["guile"], "snippet": _snippets["scheme"]},
-        "typescript": {"runner": partial(_runFile, "ts-node"), "extension": ".ts", "req": ["ts-node"], "snippet": _snippets["typescript"]},
-        "zsh":        {"runner": partial(_runFile, "zsh"), "extension": ".zsh", "req": ["zsh"], "snippet": _NO_SNIP},
+        "bash":       {"runner": partial(_runFile, "bash"), "extension": ".bash", "req": ["bash"]},
+        "c":          {"runner": partial(_runGCC, "gcc", ["-lm", "-Og", "-o"]), "extension": ".c", "req": ["gcc"]},
+        "c++":        {"runner": partial(_runGCC, "g++", ["-lm", "-Og", "-o"]), "extension": ".cpp", "req": ["g++"]},
+        "c#":         {"runner": partial(_runCSC, "csc", ["/target:exe"], "mono"), "extension": ".cs", "req": ["mono", "csc"]},
+        "d":          {"runner": partial(_runFile, "rdmd"), "extension": ".d", "req": ["dmd", "rdmd"]},
+        "dash":       {"runner": partial(_runFile, "dash"), "extension": ".dash", "req": ["dash"]},
+        "go":         {"runner": partial(_runFile, ["go", "run"]), "extension": ".go", "req": ["go"]},
+        "haskell":    {"runner": partial(_runFile, "runghc"), "extension": ".hs", "req": ["ghc", "runghc"]},
+        "java":       {"runner": partial(_runFile, "java"), "extension": ".java", "req": ["java"]},
+        "javascript": {"runner": partial(_runFile, "node"), "extension": ".js", "req": ["node"]},
+        "lua":        {"runner": partial(_runFile, "lua"), "extension": ".lua", "req": ["lua"]},
+        "perl":       {"runner": partial(_runFile, "perl"), "extension": ".pl", "req": ["perl"]},
+        "python":     {"runner": partial(_runFile, "python"), "extension": ".py", "req": ["python"]},
+        "ruby":       {"runner": partial(_runFile, "ruby"), "extension": ".rb", "req": ["ruby"]},
+        "rust":       {"runner": partial(_runGCC, "rustc", ["-o"]), "extension": ".rs", "req": ["rustc"]},
+        "sh":         {"runner": partial(_runFile, "sh"), "extension": ".sh", "req": ["sh"]},
+        "scheme":     {"runner": partial(_runFile, "guile"), "extension": ".scm", "req": ["guile"]},
+        "typescript": {"runner": partial(_runFile, "ts-node"), "extension": ".ts", "req": ["ts-node"]},
+        "zsh":        {"runner": partial(_runFile, "zsh"), "extension": ".zsh", "req": ["zsh"]},
     }
     _aliases = {
         "cpp": "c++",
@@ -239,7 +239,7 @@ import path from "path";
     def _makeFile(self) -> str:
         with open(os.path.join(tempfile.gettempdir(), f"runc_runner{self._langs[self._lang]['extension']}"), "w") as f:
             self._usedFiles.append(f.name)
-            f.write(self._langs[self._lang]["snippet"])
+            f.write(self._loadHist(self._lang))
             return f.name
 
     def _getFailedReq(self, lang: str) -> list[str]:
