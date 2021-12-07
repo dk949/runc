@@ -352,7 +352,7 @@ import path from "path";
 
         resstdout = r.stdout.decode('utf8').replace('\n', '\n' + self._TAB)
         resstderr = r.stderr.decode('utf8').replace('\n', '\n' + self._TAB)
-        resmsg = f"Success:\n\nstdout:\n{self._TAB}{resstdout}\n\nstderr:\n{self._TAB}{resstderr}"
+        resmsg = f"stdout:\n{self._TAB}{resstdout}\n\nstderr:\n{self._TAB}{resstderr}"
         print(resmsg)
 
 
