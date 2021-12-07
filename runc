@@ -77,6 +77,7 @@ class Runner:
 """
     _NO_PROGRAM: Final[None] = None
     _TAB: Final[str] = "    "
+    _CACHE_NAME: Final[str] = "runc_cache"
 
     _snippets: dict[str, str] = {
         "c":
@@ -192,8 +193,29 @@ import path from "path";
 """,
     }
 
-    def _loadHist(self, id: str) -> str:
-        return self._snippets.get(id) or self._NO_SNIP
+    def _getHistFile(self) -> Optional[str]:
+        if not self._cacheDir:
+            return None
+
+        hist = os.path.join(self._cacheDir, self._CACHE_NAME +
+                            self._langs[self._lang]["extension"])
+        return hist
+
+    def _loadHist(self) -> str:
+        emptyCache = self._snippets.get(self._lang) or self._NO_SNIP
+        if not (hist := self._getHistFile()):
+            return emptyCache
+
+        if os.path.exists(hist):
+            with open(hist, 'r') as f:
+                return f.read()
+
+        return emptyCache
+
+    def _storeHist(self) -> None:
+        if not (hist := self._getHistFile()):
+            return
+        shutil.copy2(self._file, hist)
 
     _lang: str
     _langs: LangsT = {
@@ -234,12 +256,13 @@ import path from "path";
     _editor: str
     _file: str
     _usedFiles: list[str] = []
+    _cacheDir: Optional[str]
     ret: ExitCode
 
     def _makeFile(self) -> str:
         with open(os.path.join(tempfile.gettempdir(), f"runc_runner{self._langs[self._lang]['extension']}"), "w") as f:
             self._usedFiles.append(f.name)
-            f.write(self._loadHist(self._lang))
+            f.write(self._loadHist())
             return f.name
 
     def _getFailedReq(self, lang: str) -> list[str]:
@@ -286,12 +309,29 @@ import path from "path";
                                f"Failed to run the editor. Command {r.args} failed with {r.returncode}:\n\n{r.stderr.decode('utf8')}")
         return f
 
+    def _getCacheDir(self) -> Optional[str]:
+        if sys.platform == "darwin":
+            # TODO: figure out how to do this on mac?
+            # Cache dir should be `~/Library/Caches/`
+            return None
+
+        if ((cache := os.environ.get("XDG_CACHE_HOME")) or ((h := os.environ.get("HOME")) and (cache := os.path.join(h, ".cache")))) and os.path.exists(cache):
+            cache = os.path.join(cache, self._CACHE_NAME)
+            if os.path.exists(cache):
+                return cache
+            os.mkdir(cache)
+            return cache
+
+        return None
+
     def __init__(self, lang: Optional[str]) -> None:
         try:
             self.ret = ExitCode.OK
+            self._cacheDir = self._getCacheDir()
             self._lang = self._getLang(lang)
             self._editor = self._getEditor()
             self._file = self._openEditor()
+            self._storeHist()
             self.run()
         except RunException as re:
             print(re.msg, file=sys.stderr)
