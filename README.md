@@ -13,6 +13,16 @@ Short for run code
 * `runc -a` will list all available aliases, i.e. alternative names which can be
   used as `LANG`
 
+### History
+
+* by default the edited file is cached
+  * so that using `runc LANG` with the same language will bring back the same
+    file
+* `runc LANG -n` will clear old file and just use the default snippet
+* `runc LANG -t` will not use the history file for the current invocation and
+  will not cache current invocation
+  * the next `runc LANG` will use the previous cache file
+
 ## Why?
 
 * For quickly testing something without needing to set up a whole dev
