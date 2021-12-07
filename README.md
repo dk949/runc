@@ -4,6 +4,8 @@ Short for run code
 
 ## How to use?
 
+* `make install` to install.
+  * configure install directory in `config.mk`
 * `runc LANG` will open the system editor with a quick-start code snippet (where
   applicable). Write code in the specified `LANG`. Closing the editor will
   execute the code.
