@@ -1,4 +1,4 @@
-#!/usr/bin/python3.9
+#!/usr/bin/python
 from enum import IntEnum, auto
 from functools import partial, reduce
 from typing import Callable, Optional, TypedDict, Final, Union
@@ -8,6 +8,7 @@ import subprocess as sp
 import sys
 import tempfile
 import shutil
+
 
 
 class ExitCode(IntEnum):
@@ -401,6 +402,10 @@ def parseArgs() -> argparse.Namespace:
 
 
 if __name__ == "__main__":
+
+    if (sys.version_info.major < 3 or sys.version_info.minor < 9):
+        print(f"Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} not supported")
+        exit(ExitCode.INTERNAL_ERROR)
     try:
         exit(main(parseArgs()))
     except Exception as e:
