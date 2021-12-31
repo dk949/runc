@@ -170,6 +170,17 @@ use strict;
 
 
 """,
+        "purescript":
+            """module Main where
+
+import Prelude
+import Effect
+import Effect.Console
+
+main :: Effect Unit
+main = _a
+
+""",
         "python":
         """import sys, math, time, random
 
@@ -244,6 +255,7 @@ pub fn main() void {
         "lua":        {"runner": partial(_runFile, "lua"), "extension": ".lua", "req": ["lua"]},
         "ocaml":      {"runner": partial(_runFile, "ocaml"), "extension": ".ml", "req": ["ocaml"]},
         "perl":       {"runner": partial(_runFile, "perl"), "extension": ".pl", "req": ["perl"]},
+        "purescript": {"runner": partial(_runFile, ["spago", "script"]), "extension": ".purs", "req": ["spago", "purs"]},
         "python":     {"runner": partial(_runFile, "python"), "extension": ".py", "req": ["python"]},
         "ruby":       {"runner": partial(_runFile, "ruby"), "extension": ".rb", "req": ["ruby"]},
         "rust":       {"runner": partial(_runGCC, "rustc", ["-o"]), "extension": ".rs", "req": ["rustc"]},

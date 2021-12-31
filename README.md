@@ -49,11 +49,12 @@ Most languages came from
 | :ballot_box_with_check: | Dash       | :hammer: | Kotlin       | :man_shrugging: | Crystal   | :no_entry: | Objective-C       |
 | :ballot_box_with_check: | Go         | :hammer: | PHP          |                 |           | :no_entry: | Objective-C++     |
 | :ballot_box_with_check: | Haskell    | :hammer: | PowerShell   |                 |           | :no_entry: | Puppet            |
-| :ballot_box_with_check: | Java       | :hammer: | PureScript   |                 |           | :no_entry: | Roff              |
-| :ballot_box_with_check: | JavaScript | :hammer: | R            |                 |           | :no_entry: | Swift             |
-| :ballot_box_with_check: | Lua        | :hammer: | Scala        |                 |           | :no_entry: | SystemVerilog     |
-| :ballot_box_with_check: | Ocaml      | :hammer: | Vala         |                 |           | :no_entry: | Visual Basic .NET |
-| :ballot_box_with_check: | Perl       | :hammer: | WebAssembly  |                 |           | :no_entry: | TSQL              |
+| :ballot_box_with_check: | Java       | :hammer: | R            |                 |           | :no_entry: | Roff              |
+| :ballot_box_with_check: | JavaScript | :hammer: | Scala        |                 |           | :no_entry: | Swift             |
+| :ballot_box_with_check: | Lua        | :hammer: | Vala         |                 |           | :no_entry: | SystemVerilog     |
+| :ballot_box_with_check: | Ocaml      | :hammer: | WebAssembly  |                 |           | :no_entry: | Visual Basic .NET |
+| :ballot_box_with_check: | Perl       | :hammer: |              |                 |           | :no_entry: | TSQL              |
+| :ballot_box_with_check: | PureScript |          |              |                 |           | :no_entry: | Vim script        |
 | :ballot_box_with_check: | Python     |          |              |                 |           | :no_entry: | Vim script        |
 | :ballot_box_with_check: | Ruby       |          |              |                 |           |            |                   |
 | :ballot_box_with_check: | Rust       |          |              |                 |           |            |                   |
