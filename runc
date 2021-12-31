@@ -36,7 +36,8 @@ def _runFile(program: Union[str, list[str]], args: list[str], argv: list[str], f
 
 
 def _runGCC(compiler: str, opts: list[str], args: list[str], argv: list[str], file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
-    outfile = "/tmp/a.out"
+    # FIXME: this is not portable
+    outfile = os.path.join(tempfile.gettempdir(), "a.out")
     usedFiles.append(outfile)
     r = sp.run([compiler] + opts + [outfile, file] + args,
                stdout=sp.PIPE, stderr=sp.PIPE)
@@ -46,7 +47,8 @@ def _runGCC(compiler: str, opts: list[str], args: list[str], argv: list[str], fi
 
 
 def _runCSC(compiler: str, opts: list[str], program: str, args: list[str], argv: list[str], file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
-    outfile = "/tmp/a.out"
+    # FIXME: this is not portable
+    outfile = os.path.join(tempfile.gettempdir(), "a.out")
     usedFiles.append(outfile)
     opts.append(f"/out:{outfile}")
     r = sp.run([compiler] + opts + [file] + args,
@@ -54,6 +56,23 @@ def _runCSC(compiler: str, opts: list[str], program: str, args: list[str], argv:
     if r.returncode != 0:
         return r
     return sp.run([program, outfile] + argv, stdout=sp.PIPE, stderr=sp.PIPE)
+
+
+def _runWasm(assembler: str, program: str, args: list[str], argv: list[str], file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
+    outfile = os.path.join(tempfile.gettempdir(), "a.wasm")
+    usedFiles.append(outfile)
+    r = sp.run([assembler, file, '-o', outfile] + args,
+               stdout=sp.PIPE, stderr=sp.PIPE)
+    if r.returncode != 0:
+        return r
+    compiler = os.path.join(tempfile.gettempdir(), "wasmc.js")
+    usedFiles.append(compiler)
+    with open(compiler, 'w') as f:
+        f.write(
+            f"WebAssembly.compile(require('fs').readFileSync('{outfile}')).then(b => WebAssembly.instantiate(b)).then(e => process.exit(e.exports.main())).catch(err => console.log(err) || process.exit(-1))")
+
+    return sp.run([program, compiler, outfile] + argv,
+                  stdout=sp.PIPE, stderr=sp.PIPE)
 
 
 class Runner:
@@ -205,6 +224,17 @@ import path from "path";
 
 
 """,
+        "wasm":
+            """(module
+    (func (result  i32)
+
+
+        (i32.const 0)
+    )
+  (export "main" (func 0))
+)
+
+""",
         "zig":
         """const std = @import("std");
 
@@ -262,6 +292,7 @@ pub fn main() void {
         "sh":         {"runner": partial(_runFile, "sh"), "extension": ".sh", "req": ["sh"]},
         "scheme":     {"runner": partial(_runFile, "guile"), "extension": ".scm", "req": ["guile"]},
         "typescript": {"runner": partial(_runFile, "ts-node"), "extension": ".ts", "req": ["ts-node"]},
+        "wasm":       {"runner": partial(_runWasm, "wat2wasm", "node"), "extension": ".wat", "req": ["wat2wasm", "node"]},
         "zig":        {"runner": partial(_runFile, ["zig", "run"]), "extension": ".zig", "req": ["zig"]},
         "zsh":        {"runner": partial(_runFile, "zsh"), "extension": ".zsh", "req": ["zsh"]},
     }
