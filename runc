@@ -194,6 +194,14 @@ import path from "path";
 
 
 """,
+        "zig":
+        """const std = @import("std");
+
+pub fn main() void {
+
+
+}
+""",
     }
 
     def _getHistFile(self) -> Optional[str]:
@@ -240,6 +248,7 @@ import path from "path";
         "sh":         {"runner": partial(_runFile, "sh"), "extension": ".sh", "req": ["sh"]},
         "scheme":     {"runner": partial(_runFile, "guile"), "extension": ".scm", "req": ["guile"]},
         "typescript": {"runner": partial(_runFile, "ts-node"), "extension": ".ts", "req": ["ts-node"]},
+        "zig":        {"runner": partial(_runFile, ["zig", "run"]), "extension": ".zig", "req": ["zig"]},
         "zsh":        {"runner": partial(_runFile, "zsh"), "extension": ".zsh", "req": ["zsh"]},
     }
     _aliases = {

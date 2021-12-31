@@ -59,3 +59,4 @@ Most languages came from
 | :ballot_box_with_check: | Scheme     |          |              |                 |           |            |                   |
 | :ballot_box_with_check: | TypeScript |          |              |                 |           |            |                   |
 | :ballot_box_with_check: | Zsh        |          |              |                 |           |            |                   |
+| :ballot_box_with_check: | Zig        |          |              |                 |           |            |                   |
