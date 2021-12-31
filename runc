@@ -234,6 +234,7 @@ pub fn main() void {
         "c":          {"runner": partial(_runGCC, "gcc", ["-lm", "-Og", "-o"]), "extension": ".c", "req": ["gcc"]},
         "c++":        {"runner": partial(_runGCC, "g++", ["-lm", "-Og", "-o"]), "extension": ".cpp", "req": ["g++"]},
         "c#":         {"runner": partial(_runCSC, "csc", ["/target:exe"], "mono"), "extension": ".cs", "req": ["mono", "csc"]},
+        "cmake":      {"runner": partial(_runFile, ["cmake", "-P"]), "extension": ".cmake", "req": ["cmake"]},
         "d":          {"runner": partial(_runFile, "rdmd"), "extension": ".d", "req": ["dmd", "rdmd"]},
         "dash":       {"runner": partial(_runFile, "dash"), "extension": ".dash", "req": ["dash"]},
         "go":         {"runner": partial(_runFile, ["go", "run"]), "extension": ".go", "req": ["go"]},
