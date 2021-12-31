@@ -47,14 +47,15 @@ Most languages came from
 | :ballot_box_with_check: | Cmake      | :hammer: | Fortran      | :man_shrugging: | Julia     | :no_entry: | NASL              |
 | :ballot_box_with_check: | D          | :hammer: | Groovy       | :man_shrugging: | Smalltalk | :no_entry: | Nix               |
 | :ballot_box_with_check: | Dash       | :hammer: | Kotlin       | :man_shrugging: | Crystal   | :no_entry: | Objective-C       |
-| :ballot_box_with_check: | Go         | :hammer: | OCaml        |                 |           | :no_entry: | Objective-C++     |
-| :ballot_box_with_check: | Haskell    | :hammer: | PHP          |                 |           | :no_entry: | Puppet            |
-| :ballot_box_with_check: | Java       | :hammer: | PowerShell   |                 |           | :no_entry: | Roff              |
-| :ballot_box_with_check: | JavaScript | :hammer: | PureScript   |                 |           | :no_entry: | Swift             |
-| :ballot_box_with_check: | Lua        | :hammer: | R            |                 |           | :no_entry: | SystemVerilog     |
-| :ballot_box_with_check: | Perl       | :hammer: | Scala        |                 |           | :no_entry: | Visual Basic .NET |
-| :ballot_box_with_check: | Python     | :hammer: | Vala         |                 |           | :no_entry: | TSQL              |
-| :ballot_box_with_check: | Ruby       | :hammer: | WebAssembly  |                 |           | :hammer:   | Vim script        |
+| :ballot_box_with_check: | Go         | :hammer: | PHP          |                 |           | :no_entry: | Objective-C++     |
+| :ballot_box_with_check: | Haskell    | :hammer: | PowerShell   |                 |           | :no_entry: | Puppet            |
+| :ballot_box_with_check: | Java       | :hammer: | PureScript   |                 |           | :no_entry: | Roff              |
+| :ballot_box_with_check: | JavaScript | :hammer: | R            |                 |           | :no_entry: | Swift             |
+| :ballot_box_with_check: | Lua        | :hammer: | Scala        |                 |           | :no_entry: | SystemVerilog     |
+| :ballot_box_with_check: | Ocaml      | :hammer: | Vala         |                 |           | :no_entry: | Visual Basic .NET |
+| :ballot_box_with_check: | Perl       | :hammer: | WebAssembly  |                 |           | :no_entry: | TSQL              |
+| :ballot_box_with_check: | Python     |          |              |                 |           | :no_entry: | Vim script        |
+| :ballot_box_with_check: | Ruby       |          |              |                 |           |            |                   |
 | :ballot_box_with_check: | Rust       |          |              |                 |           |            |                   |
 | :ballot_box_with_check: | Shell      |          |              |                 |           |            |                   |
 | :ballot_box_with_check: | Scheme     |          |              |                 |           |            |                   |
