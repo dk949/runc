@@ -9,9 +9,7 @@ Short for run code
 * `runc LANG` will open the system editor with a quick-start code snippet (where
   applicable). Write code in the specified `LANG`. Closing the editor will
   execute the code.
-* `runc -l` will list all available languages
-* `runc -a` will list all available aliases, i.e. alternative names which can be
-  used as `LANG`
+* `runc --help` for other options
 
 ### History
 

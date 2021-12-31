@@ -28,32 +28,32 @@ class RunException(Exception):
         self.msg = msg
 
 
-def _runFile(program: Union[str, list[str]], file: str, _: list[str]) -> sp.CompletedProcess[bytes]:
+def _runFile(program: Union[str, list[str]], args: list[str], argv: list[str], file: str, _: list[str]) -> sp.CompletedProcess[bytes]:
     if isinstance(program, str):
-        return sp.run([program, file], stdout=sp.PIPE, stderr=sp.PIPE)
+        return sp.run([program] + args + [file] + argv, stdout=sp.PIPE, stderr=sp.PIPE)
     else:
-        return sp.run(program + [file], stdout=sp.PIPE, stderr=sp.PIPE)
+        return sp.run(program + args + [file] + argv, stdout=sp.PIPE, stderr=sp.PIPE)
 
 
-def _runGCC(compiler: str, opts: list[str], file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
+def _runGCC(compiler: str, opts: list[str], args: list[str], argv: list[str], file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
     outfile = "/tmp/a.out"
     usedFiles.append(outfile)
-    r = sp.run([compiler] + opts + [outfile, file],
+    r = sp.run([compiler] + opts + [outfile, file] + args,
                stdout=sp.PIPE, stderr=sp.PIPE)
     if r.returncode != 0:
         return r
-    return sp.run(outfile, stdout=sp.PIPE, stderr=sp.PIPE)
+    return sp.run([outfile] + argv, stdout=sp.PIPE, stderr=sp.PIPE)
 
 
-def _runCSC(compiler: str, opts: list[str], program: str, file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
+def _runCSC(compiler: str, opts: list[str], program: str, args: list[str], argv: list[str], file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
     outfile = "/tmp/a.out"
     usedFiles.append(outfile)
     opts.append(f"/out:{outfile}")
-    r = sp.run([compiler] + opts + [file],
+    r = sp.run([compiler] + opts + [file] + args,
                stdout=sp.PIPE, stderr=sp.PIPE)
     if r.returncode != 0:
         return r
-    return sp.run([program, outfile], stdout=sp.PIPE, stderr=sp.PIPE)
+    return sp.run([program, outfile] + argv, stdout=sp.PIPE, stderr=sp.PIPE)
 
 
 class Runner:
@@ -61,7 +61,10 @@ class Runner:
     class LangT(TypedDict):
         # Use the second parameter to store the list of files used by the runner.
         # Append to the list to have the files automatically deleted at the end of the run
-        runner: Callable[[str, list[str]], sp.CompletedProcess]
+        runner: Callable[
+            [list[str], list[str], str, list[str]],  # args
+            sp.CompletedProcess                     # ret
+        ]
 
         # has to include the dot. e.g '.py' not 'py'
         extension: str
@@ -82,7 +85,7 @@ class Runner:
     _snippets: dict[str, str] = {
         "c":
         """#include <stdio.h>
-#include <math.h>
+# include <math.h>
 
 int main(int argc, const char **argv) {
 
@@ -92,10 +95,10 @@ int main(int argc, const char **argv) {
 """,
         "c++":
         """#include <iostream>
-#include <vector>
-#include <string>
-#include <algorithm>
-#include <cmath>
+# include <vector>
+# include <string>
+# include <algorithm>
+# include <cmath>
 
 
 int main(int argc, const char **argv) {
@@ -221,7 +224,7 @@ import path from "path";
     _langs: LangsT = {
         "bash":       {"runner": partial(_runFile, "bash"), "extension": ".bash", "req": ["bash"]},
         "c":          {"runner": partial(_runGCC, "gcc", ["-lm", "-Og", "-o"]), "extension": ".c", "req": ["gcc"]},
-        "c++":        {"runner": partial(_runGCC, "g++", ["-lm", "-std=c++20", "-Og", "-o"]), "extension": ".cpp", "req": ["g++"]},
+        "c++":        {"runner": partial(_runGCC, "g++", ["-lm", "-Og", "-o"]), "extension": ".cpp", "req": ["g++"]},
         "c#":         {"runner": partial(_runCSC, "csc", ["/target:exe"], "mono"), "extension": ".cs", "req": ["mono", "csc"]},
         "d":          {"runner": partial(_runFile, "rdmd"), "extension": ".d", "req": ["dmd", "rdmd"]},
         "dash":       {"runner": partial(_runFile, "dash"), "extension": ".dash", "req": ["dash"]},
@@ -324,7 +327,7 @@ import path from "path";
 
         return None
 
-    def __init__(self, lang: Optional[str], noHist: bool, newHist: bool) -> None:
+    def __init__(self, lang: Optional[str], compilerArgs: Optional[list[str]], progArgs: Optional[list[str]], noHist: bool, newHist: bool) -> None:
         try:
             self.ret = ExitCode.OK
             self._cacheDir = None if noHist else self._getCacheDir()
@@ -332,7 +335,7 @@ import path from "path";
             self._editor = self._getEditor()
             self._file = self._openEditor(newHist)
             self._storeHist()
-            self.run()
+            self.run(compilerArgs, progArgs)
         except RunException as re:
             print(re.msg, file=sys.stderr)
             self.ret = re.errorCode
@@ -341,8 +344,17 @@ import path from "path";
         for file in self._usedFiles:
             (os.path.exists(file) and os.remove(file))
 
-    def run(self) -> None:
-        r = self._langs[self._lang]["runner"](self._file, self._usedFiles)
+    def run(self, compilerArgs: Optional[list[str]], progArgs: Optional[list[str]]) -> None:
+        args: list[str] =\
+            [] if not compilerArgs else compilerArgs[0].split(' ')
+
+        argv: list[str] =\
+            [] if not progArgs else progArgs[0].split(' ')
+
+        r = self._langs[self._lang]["runner"](
+            args, argv, self._file, self._usedFiles
+        )
+
         if r.returncode != 0:
             errstdout = r.stdout.decode('utf8').replace('\n', '\n' + self._TAB)
             errstderr = r.stderr.decode('utf8').replace('\n', '\n' + self._TAB)
@@ -358,28 +370,32 @@ import path from "path";
 
 
 def main(args: argparse.Namespace) -> int:
-    if args.lang:
-        return Runner(args.lang, args.noHist, args.newHist).ret
-    elif args.ls:
+
+    if args.ls:
         print("Avaliable language:\n___________________")
         list(map(partial(print, "   "), Runner._langs))
         return ExitCode.OK
-    elif args.aliases:
+    if args.aliases:
         print("Avaliable aliases:\n___________________")
         list(map(lambda a: print(str(a[0]).rjust(10), ':', str(
             a[1]).ljust(10)), Runner._aliases.items()))
         return ExitCode.OK
+
+    if args.lang:
+        return Runner(args.lang, args.compilerArgs, args.progArgs, args.noHist, args.newHist).ret
+
     print("Bad args. try '-h/--help'")
     return ExitCode.ARGUMENT_ERROR
 
 
 def genEpilog() -> str:
-    out = ["Exit codes:"]
+    out = []
+    out.append("Exit codes:")
+
     for c in ExitCode:
         out.append(
             f"{' ' * (7 if c.value < 0 or  c.value > 9 else 8)}{c.value} : {c.name}")
     out.append(' ')
-
     return '\n'.join(out)
 
 
@@ -390,13 +406,16 @@ def parseArgs() -> argparse.Namespace:
                         help='ignore history and use default snippet')
     parser.add_argument('--new-history', '-n', dest='newHist', action='store_true',
                         help='reset current language history to default')
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('lang', metavar='LANG', nargs='?',
-                       help='language to be ran', default=None)
-    group.add_argument('--ls', '-l', action="store_true",
-                       help="list available languages")
-    group.add_argument('--aliases', '-a', action="store_true",
-                       help="list available languages")
+    parser.add_argument('--args', metavar='ARGS', dest='compilerArgs', nargs=1, default=None,
+                        help="space separated list of arguments to be passed to the compiler or the interpreter.")
+    parser.add_argument('--argv', metavar='ARGS', dest='progArgs', nargs=1, default=None,
+                        help="space separated list of arguments to be passed to the executed program")
+    parser.add_argument('lang', metavar='LANG', nargs='?',
+                        help='language to be ran', default=None)
+    parser.add_argument('--ls', '-l', action="store_true",
+                        help="list available languages")
+    parser.add_argument('--aliases', '-l', action="store_true",
+                        help="list available languages")
 
     return parser.parse_args()
 
@@ -409,6 +428,9 @@ if __name__ == "__main__":
         exit(ExitCode.INTERNAL_ERROR)
     try:
         exit(main(parseArgs()))
+    except argparse.ArgumentError as e:
+        print(e)
+        exit(ExitCode.ARGUMENT_ERROR)
     except Exception as e:
         print("Unexpected exception occurred:", e)
         exit(ExitCode.INTERNAL_ERROR)
