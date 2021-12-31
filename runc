@@ -10,7 +10,6 @@ import tempfile
 import shutil
 
 
-
 class ExitCode(IntEnum):
     INTERNAL_ERROR = -1
     OK = auto()
@@ -222,7 +221,7 @@ import path from "path";
     _langs: LangsT = {
         "bash":       {"runner": partial(_runFile, "bash"), "extension": ".bash", "req": ["bash"]},
         "c":          {"runner": partial(_runGCC, "gcc", ["-lm", "-Og", "-o"]), "extension": ".c", "req": ["gcc"]},
-        "c++":        {"runner": partial(_runGCC, "g++", ["-lm", "-Og", "-o"]), "extension": ".cpp", "req": ["g++"]},
+        "c++":        {"runner": partial(_runGCC, "g++", ["-lm", "-std=c++20", "-Og", "-o"]), "extension": ".cpp", "req": ["g++"]},
         "c#":         {"runner": partial(_runCSC, "csc", ["/target:exe"], "mono"), "extension": ".cs", "req": ["mono", "csc"]},
         "d":          {"runner": partial(_runFile, "rdmd"), "extension": ".d", "req": ["dmd", "rdmd"]},
         "dash":       {"runner": partial(_runFile, "dash"), "extension": ".dash", "req": ["dash"]},
@@ -347,7 +346,8 @@ import path from "path";
         if r.returncode != 0:
             errstdout = r.stdout.decode('utf8').replace('\n', '\n' + self._TAB)
             errstderr = r.stderr.decode('utf8').replace('\n', '\n' + self._TAB)
-            errcmd = reduce(lambda a, b: a + ' ' + b, r.args)
+            errcmd = r.args if isinstance(r.args, str) else reduce(
+                lambda a, b: a + ' ' + b, r.args)
             errmsg = f"Command '{errcmd}' failed with {r.returncode}:\n\nstdout:\n{self._TAB}{errstdout}\n\nstderr:\n{self._TAB}{errstderr}"
             raise RunException(ExitCode.CODE_ERROR, errmsg)
 
@@ -404,7 +404,8 @@ def parseArgs() -> argparse.Namespace:
 if __name__ == "__main__":
 
     if (sys.version_info.major < 3 or sys.version_info.minor < 9):
-        print(f"Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} not supported")
+        print(
+            f"Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro} not supported")
         exit(ExitCode.INTERNAL_ERROR)
     try:
         exit(main(parseArgs()))
