@@ -61,17 +61,14 @@ def _runCSC(compiler: str, opts: list[str], program: str, args: list[str], argv:
 def _runWasm(assembler: str, program: str, args: list[str], argv: list[str], file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
     outfile = os.path.join(tempfile.gettempdir(), "a.wasm")
     usedFiles.append(outfile)
+    compiler = bytes(
+        f"WebAssembly.compile(require('fs').readFileSync('{outfile}')).then(b => WebAssembly.instantiate(b)).then(e => process.exit(e.exports.main())).catch(err => console.log(err) || process.exit(-1))", 'utf8')
     r = sp.run([assembler, file, '-o', outfile] + args,
                stdout=sp.PIPE, stderr=sp.PIPE)
     if r.returncode != 0:
         return r
-    compiler = os.path.join(tempfile.gettempdir(), "wasmc.js")
-    usedFiles.append(compiler)
-    with open(compiler, 'w') as f:
-        f.write(
-            f"WebAssembly.compile(require('fs').readFileSync('{outfile}')).then(b => WebAssembly.instantiate(b)).then(e => process.exit(e.exports.main())).catch(err => console.log(err) || process.exit(-1))")
-
-    return sp.run([program, compiler, outfile] + argv,
+    return sp.run([program] + argv,
+                  input=compiler,
                   stdout=sp.PIPE, stderr=sp.PIPE)
 
 
@@ -298,16 +295,20 @@ pub fn main() void {
     }
     _aliases = {
         "cpp": "c++",
-        "cxx": "c++",
         "cs": "c#",
         "csharp": "c#",
+        "cxx": "c++",
         "hs": "haskell",
         "js": "javascript",
+        "ml": "ocaml",
+        "pl": "perl",
+        "purs": "purescript",
         "py": "python",
         "rb": "ruby",
         "rs": "rust",
         "scm": "scheme",
         "ts": "typescript",
+        "wat": "wasm",
     }
 
     _editor: str
