@@ -215,6 +215,11 @@ fn main() {
 }
 
         """,
+        "scala":
+            """
+@main def main = _;
+
+""",
         "scheme": """(begin
 
 
@@ -294,6 +299,7 @@ pub fn main() void {
         "ruby":         {"runner": partial(_runFile, "ruby"), "extension": ".rb", "req": ["ruby"]},
         "rust":         {"runner": partial(_runGCC, "rustc", ["-o"]), "extension": ".rs", "req": ["rustc"]},
         "sh":           {"runner": partial(_runFile, "sh"), "extension": ".sh", "req": ["sh"]},
+        "scala":        {"runner": partial(_runFile, "scala"), "extension": ".scala", "req": ["scala"]},
         "scheme":       {"runner": partial(_runFile, "guile"), "extension": ".scm", "req": ["guile"]},
         "typescript":   {"runner": partial(_runFile, "ts-node"), "extension": ".ts", "req": ["ts-node"]},
         "wasm":         {"runner": partial(_runWasm, "wat2wasm", "node"), "extension": ".wat", "req": ["wat2wasm", "node"]},

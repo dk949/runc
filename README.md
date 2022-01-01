@@ -48,8 +48,8 @@ Most languages came from
 | :ballot_box_with_check: | CoffeeScript | :hammer: | Kotlin     | :man_shrugging: | Smalltalk | :no_entry: | Nix               |
 | :ballot_box_with_check: | D            | :hammer: | PowerShell | :man_shrugging: | Crystal   | :no_entry: | Objective-C       |
 | :ballot_box_with_check: | Dash         | :hammer: | R          | :man_shrugging: | APL       | :no_entry: | Objective-C++     |
-| :ballot_box_with_check: | Go           | :hammer: | Scala      |                 |           | :no_entry: | Puppet            |
-| :ballot_box_with_check: | Haskell      | :hammer: | Vala       |                 |           | :no_entry: | Swift             |
+| :ballot_box_with_check: | Go           | :hammer: | Vala       |                 |           | :no_entry: | Puppet            |
+| :ballot_box_with_check: | Haskell      |          |            |                 |           | :no_entry: | Swift             |
 | :ballot_box_with_check: | Java         |          |            |                 |           | :no_entry: | SystemVerilog     |
 | :ballot_box_with_check: | JavaScript   |          |            |                 |           | :no_entry: | Visual Basic .NET |
 | :ballot_box_with_check: | Lua          |          |            |                 |           | :no_entry: | TSQL              |
@@ -61,6 +61,7 @@ Most languages came from
 | :ballot_box_with_check: | Ruby         |          |            |                 |           |            |                   |
 | :ballot_box_with_check: | Rust         |          |            |                 |           |            |                   |
 | :ballot_box_with_check: | Shell        |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | Scala        |          |            |                 |           |            |                   |
 | :ballot_box_with_check: | Scheme       |          |            |                 |           |            |                   |
 | :ballot_box_with_check: | TypeScript   |          |            |                 |           |            |                   |
 | :ballot_box_with_check: | WebAssembly  |          |            |                 |           |            |                   |
