@@ -186,6 +186,11 @@ use strict;
 
 
 """,
+        "php":
+            """<?php
+
+?>
+""",
         "purescript":
             """module Main where
 
@@ -283,6 +288,7 @@ pub fn main() void {
         "lua":          {"runner": partial(_runFile, "lua"), "extension": ".lua", "req": ["lua"]},
         "ocaml":        {"runner": partial(_runFile, "ocaml"), "extension": ".ml", "req": ["ocaml"]},
         "perl":         {"runner": partial(_runFile, "perl"), "extension": ".pl", "req": ["perl"]},
+        "php":          {"runner": partial(_runFile, "php"), "extension": ".php", "req": ["php"]},
         "purescript":   {"runner": partial(_runFile, ["spago", "script"]), "extension": ".purs", "req": ["spago", "purs"]},
         "python":       {"runner": partial(_runFile, "python"), "extension": ".py", "req": ["python"]},
         "ruby":         {"runner": partial(_runFile, "ruby"), "extension": ".rb", "req": ["ruby"]},

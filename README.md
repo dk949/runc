@@ -46,15 +46,16 @@ Most languages came from
 | :ballot_box_with_check: | C++          | :hammer: | Fortran    | :man_shrugging: | Erlang    | :no_entry: | MATLAB            |
 | :ballot_box_with_check: | Cmake        | :hammer: | Groovy     | :man_shrugging: | Julia     | :no_entry: | NASL              |
 | :ballot_box_with_check: | CoffeeScript | :hammer: | Kotlin     | :man_shrugging: | Smalltalk | :no_entry: | Nix               |
-| :ballot_box_with_check: | D            | :hammer: | PHP        | :man_shrugging: | Crystal   | :no_entry: | Objective-C       |
-| :ballot_box_with_check: | Dash         | :hammer: | PowerShell | :man_shrugging: | APL       | :no_entry: | Objective-C++     |
-| :ballot_box_with_check: | Go           | :hammer: | R          |                 |           | :no_entry: | Puppet            |
-| :ballot_box_with_check: | Haskell      | :hammer: | Scala      |                 |           | :no_entry: | Swift             |
-| :ballot_box_with_check: | Java         | :hammer: | Vala       |                 |           | :no_entry: | SystemVerilog     |
+| :ballot_box_with_check: | D            | :hammer: | PowerShell | :man_shrugging: | Crystal   | :no_entry: | Objective-C       |
+| :ballot_box_with_check: | Dash         | :hammer: | R          | :man_shrugging: | APL       | :no_entry: | Objective-C++     |
+| :ballot_box_with_check: | Go           | :hammer: | Scala      |                 |           | :no_entry: | Puppet            |
+| :ballot_box_with_check: | Haskell      | :hammer: | Vala       |                 |           | :no_entry: | Swift             |
+| :ballot_box_with_check: | Java         |          |            |                 |           | :no_entry: | SystemVerilog     |
 | :ballot_box_with_check: | JavaScript   |          |            |                 |           | :no_entry: | Visual Basic .NET |
 | :ballot_box_with_check: | Lua          |          |            |                 |           | :no_entry: | TSQL              |
 | :ballot_box_with_check: | Ocaml        |          |            |                 |           | :no_entry: | Vim script        |
 | :ballot_box_with_check: | Perl         |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | PHP          |          |            |                 |           |            |                   |
 | :ballot_box_with_check: | PureScript   |          |            |                 |           |            |                   |
 | :ballot_box_with_check: | Python       |          |            |                 |           |            |                   |
 | :ballot_box_with_check: | Ruby         |          |            |                 |           |            |                   |
