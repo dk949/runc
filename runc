@@ -144,6 +144,13 @@ int main(){
     return 0;
 }
 """,
+        "fortran":
+        """program runner
+  implicit none
+
+
+end program runner
+""",
         "haskell":
         """module Main where
 
@@ -216,8 +223,7 @@ fn main() {
 
         """,
         "scala":
-            """
-@main def main = _;
+            """@main def main = _;
 
 """,
         "scheme": """(begin
@@ -286,6 +292,7 @@ pub fn main() void {
         "coffeescript": {"runner": partial(_runFile, "coffee"), "extension": ".coffee", "req": ["coffee"]},
         "d":            {"runner": partial(_runFile, "rdmd"), "extension": ".d", "req": ["dmd", "rdmd"]},
         "dash":         {"runner": partial(_runFile, "dash"), "extension": ".dash", "req": ["dash"]},
+        "fortran":      {"runner": partial(_runGCC, "gfortran", ["-Og", "-o"]), "extension": ".f90", "req": ["gfortran"]},
         "go":           {"runner": partial(_runFile, ["go", "run"]), "extension": ".go", "req": ["go"]},
         "haskell":      {"runner": partial(_runFile, "runghc"), "extension": ".hs", "req": ["ghc", "runghc"]},
         "java":         {"runner": partial(_runFile, "java"), "extension": ".java", "req": ["java"]},
@@ -312,6 +319,7 @@ pub fn main() void {
         "csharp": "c#",
         "coffee": "coffeescript",
         "cxx": "c++",
+        "f90": "fortran",
         "hs": "haskell",
         "js": "javascript",
         "ml": "ocaml",
