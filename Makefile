@@ -1,7 +1,7 @@
 include config.mk
-all: build
+all: runc
 
-build: runc.rs
+runc: runc.rs
 	rustc runc.rs -O
 	strip runc
 
@@ -16,4 +16,3 @@ uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/runc
 
 .PHONY: all clean install uninstall
-
