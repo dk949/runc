@@ -132,8 +132,6 @@ trait HistWritable {
 
 impl Drop for Runner {
     fn drop(&mut self) {
-        println!("dropped");
-        dbg!(&self.used_files);
         for file in self.used_files.borrow().iter() {
             if Path::new(file).exists() {
                 // FIXME
@@ -190,7 +188,6 @@ impl Runner {
         self.used_files
             .borrow_mut()
             .push(file_name.to_string_lossy().to_string());
-        dbg!(&self.used_files);
         let mut file = File::create(&file_name).or(Err((
             ExitCode::FileError,
             "could not open file".to_string(),
@@ -299,6 +296,7 @@ impl Runner {
         Runner {
             #[cfg_attr(rustfmt, rustfmt_skip)]
             langs: HashMap::from([
+                ("python", Lang { runner: bind_lang!(&[&"python"]), extension: ".py", req: &["python"]})
                 ("python", Lang { runner: bind_lang!(&[&"python"]), extension: ".py", req: &["python"]})
             ]),
             cache_dir: Self::get_cache_dir(no_hist),
@@ -482,13 +480,15 @@ fn main() {
     }
 
     if let Some(lang) = args.lang.val {
-        match Runner::new(lang, args.no_hist.val, args.new_hist.val) {
-            Ok(runner) => exit(runner.run(args.compiler_args.val, args.prog_args.val) as i32),
-            Err(err) => {
-                println!("{}", err.1);
-                exit(err.0 as i32)
-            }
-        };
+        exit(
+            match Runner::new(lang, args.no_hist.val, args.new_hist.val) {
+                Ok(runner) => runner.run(args.compiler_args.val, args.prog_args.val),
+                Err(err) => {
+                    println!("{}", err.1);
+                    err.0
+                }
+            } as i32,
+        );
     } else {
         println!("Bad args. try '-h/--help'");
         exit(ExitCode::ArgumentError as i32);
