@@ -1,6 +1,7 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt;
+use std::fmt::{Display};
 use std::fs;
 use std::fs::File;
 use std::io;
@@ -21,6 +22,12 @@ enum ExitCode {
     FileError,
     RunnerError,
     CodeError,
+}
+
+impl Display for ExitCode{
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+       write!(f, "{:?}", self)
+    }
 }
 
 type RunError = (ExitCode, String);
@@ -56,6 +63,7 @@ struct Lang {
     // list of executables that have to be present in order to run the program
     req: &'static [&'static str],
 }
+
 impl fmt::Debug for Lang {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
@@ -69,6 +77,7 @@ impl fmt::Debug for Lang {
 #[derive(Debug)]
 struct Runner {
     langs: HashMap<&'static str, Lang>,
+    aliases: HashMap<&'static str, &'static str>,
     cache_dir: Option<String>,
     lang: String,
     editor: String,
@@ -281,10 +290,14 @@ impl Runner {
 
     fn init(mut self, new_hist: bool) -> Result<Self, RunError> {
         if !self.langs.contains_key(&self.lang.as_str()) {
-            return Err((
-                ExitCode::LanguageError,
-                format!("unsupported language \"{}\"", self.lang),
-            ));
+            self.lang = self
+                .aliases
+                .get(self.lang.as_str())
+                .ok_or((
+                    ExitCode::LanguageError,
+                    format!("unsupported language \"{}\"", self.lang),
+                ))?
+                .to_string();
         }
         let file = self.open_editor(new_hist)?;
         self.file = Some(file);
@@ -292,10 +305,9 @@ impl Runner {
         Ok(self)
     }
 
-    fn new(lang: String, no_hist: bool, new_hist: bool) -> Result<Self, RunError> {
-        Runner {
-            #[cfg_attr(rustfmt, rustfmt_skip)]
-            langs: HashMap::from([
+    #[cfg_attr(rustfmt, rustfmt_skip)]
+    fn make_langs() -> HashMap<&'static str, Lang> {
+        HashMap::from([
                 ("bash"         , Lang { runner: bind_lang!(&[&"bash"])            , extension: ".bash"  , req: &["bash"]          }),
                 ("cmake"        , Lang { runner: bind_lang!(&[&"cmake", &"-P"])    , extension: ".cmake" , req: &["cmake"]         }),
                 ("coffeescript" , Lang { runner: bind_lang!(&[&"coffee"])          , extension: ".coffee", req: &["coffee"]        }),
@@ -318,13 +330,43 @@ impl Runner {
                 ("typescript"   , Lang { runner: bind_lang!(&[&"ts-node"])         , extension: ".ts"    , req: &["ts-node"]       }),
                 ("zig"          , Lang { runner: bind_lang!(&[&"zig", &"run"])     , extension: ".zig"   , req: &["zig"]           }),
                 ("zsh"          , Lang { runner: bind_lang!(&[&"zsh"])             , extension: ".zsh"   , req: &["zsh"]           }),
-            ]),
+            ])
+    }
+
+    #[cfg_attr(rustfmt, rustfmt_skip)]
+    fn make_aliases() -> HashMap<&'static str, &'static str> {
+        HashMap::from([
+            ("cpp"   , "c++")         ,
+            ("cs"    , "c#")          ,
+            ("csharp", "c#")          ,
+            ("coffee", "coffeescript"),
+            ("cxx"   , "c++")         ,
+            ("f90"   , "fortran")     ,
+            ("hs"    , "haskell")     ,
+            ("js"    , "javascript")  ,
+            ("ml"    , "ocaml")       ,
+            ("pl"    , "perl")        ,
+            ("purs"  , "purescript")  ,
+            ("py"    , "python")      ,
+            ("rb"    , "ruby")        ,
+            ("rs"    , "rust")        ,
+            ("scm"   , "scheme")      ,
+            ("ts"    , "typescript")  ,
+            ("wat"   , "wasm")        ,
+        ])
+    }
+
+    fn new(lang: String, no_hist: bool, new_hist: bool) -> Result<Self, RunError> {
+        Runner {
+            langs: Self::make_langs(),
+            aliases: Self::make_aliases(),
             cache_dir: Self::get_cache_dir(no_hist),
             lang: lang,
             editor: Self::get_editor()?,
             file: None,
             used_files: RefCell::new(Vec::new()),
-        }.init(new_hist)
+        }
+        .init(new_hist)
     }
 
     fn run(&self, compiler_args: Option<String>, prog_args: Option<String>) -> ExitCode {
@@ -338,7 +380,7 @@ impl Runner {
             self.file
                 .as_ref()
                 .expect("expected self.file to be set at this point")
-                .to_string(), // FIXME: do I have to copy here? (not that it matters much, but still)
+                .to_string(),
             &mut Vec::new(),
         )
         .handle_command()
@@ -489,13 +531,17 @@ fn main() {
     let args = args.unwrap();
 
     if args.ls.val {
-        println!("Avaliable language:\n___________________");
-        //list(map(partial(print, "   "), Runner._langs))
+        println!("Avaliable language:\n-------------------");
+        Runner::make_langs()
+            .keys()
+            .for_each(|lang| println!("    {}", lang));
         exit(ExitCode::Ok as i32);
     }
     if args.aliases.val {
-        println!("Avaliable aliases:\n___________________");
-        //list(map(lambda a: print(str(a[0]).rjust(10), ':', str(a[1]).ljust(10)), Runner._aliases.items()))
+        println!("     alias : language\n--------------------");
+        Runner::make_aliases()
+            .iter()
+            .for_each(|(alias, language)| println!("{:>10} : {:<10}", alias, language));
         exit(ExitCode::Ok as i32);
     }
 
