@@ -296,8 +296,28 @@ impl Runner {
         Runner {
             #[cfg_attr(rustfmt, rustfmt_skip)]
             langs: HashMap::from([
-                ("python", Lang { runner: bind_lang!(&[&"python"]), extension: ".py", req: &["python"]})
-                ("python", Lang { runner: bind_lang!(&[&"python"]), extension: ".py", req: &["python"]})
+                ("bash"         , Lang { runner: bind_lang!(&[&"bash"])            , extension: ".bash"  , req: &["bash"]          }),
+                ("cmake"        , Lang { runner: bind_lang!(&[&"cmake", &"-P"])    , extension: ".cmake" , req: &["cmake"]         }),
+                ("coffeescript" , Lang { runner: bind_lang!(&[&"coffee"])          , extension: ".coffee", req: &["coffee"]        }),
+                ("d"            , Lang { runner: bind_lang!(&[&"rdmd"])            , extension: ".d"     , req: &["dmd", "rdmd"]   }),
+                ("dash"         , Lang { runner: bind_lang!(&[&"dash"])            , extension: ".dash"  , req: &["dash"]          }),
+                ("go"           , Lang { runner: bind_lang!(&[&"go", &"run"])      , extension: ".go"    , req: &["go"]            }),
+                ("haskell"      , Lang { runner: bind_lang!(&[&"runghc"])          , extension: ".hs"    , req: &["ghc", "runghc"] }),
+                ("java"         , Lang { runner: bind_lang!(&[&"java"])            , extension: ".java"  , req: &["java"]          }),
+                ("javascript"   , Lang { runner: bind_lang!(&[&"node"])            , extension: ".js"    , req: &["node"]          }),
+                ("lua"          , Lang { runner: bind_lang!(&[&"lua"])             , extension: ".lua"   , req: &["lua"]           }),
+                ("ocaml"        , Lang { runner: bind_lang!(&[&"ocaml"])           , extension: ".ml"    , req: &["ocaml"]         }),
+                ("perl"         , Lang { runner: bind_lang!(&[&"perl"])            , extension: ".pl"    , req: &["perl"]          }),
+                ("php"          , Lang { runner: bind_lang!(&[&"php"])             , extension: ".php"   , req: &["php"]           }),
+                ("purescript"   , Lang { runner: bind_lang!(&[&"spago", &"script"]), extension: ".purs"  , req: &["spago", "purs"] }),
+                ("python"       , Lang { runner: bind_lang!(&[&"python"])          , extension: ".py"    , req: &["python"]        }),
+                ("ruby"         , Lang { runner: bind_lang!(&[&"ruby"])            , extension: ".rb"    , req: &["ruby"]          }),
+                ("scala"        , Lang { runner: bind_lang!(&[&"scala"])           , extension: ".scala" , req: &["scala"]         }),
+                ("scheme"       , Lang { runner: bind_lang!(&[&"guile"])           , extension: ".scm"   , req: &["guile"]         }),
+                ("sh"           , Lang { runner: bind_lang!(&[&"sh"])              , extension: ".sh"    , req: &["sh"]            }),
+                ("typescript"   , Lang { runner: bind_lang!(&[&"ts-node"])         , extension: ".ts"    , req: &["ts-node"]       }),
+                ("zig"          , Lang { runner: bind_lang!(&[&"zig", &"run"])     , extension: ".zig"   , req: &["zig"]           }),
+                ("zsh"          , Lang { runner: bind_lang!(&[&"zsh"])             , extension: ".zsh"   , req: &["zsh"]           }),
             ]),
             cache_dir: Self::get_cache_dir(no_hist),
             lang: lang,
