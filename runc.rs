@@ -1,11 +1,13 @@
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt;
-use std::fmt::{Display};
+use std::fmt::Display;
 use std::fs;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
+use std::iter::Zip;
+use std::ops::RangeFrom;
 use std::path::Path;
 use std::process::{exit, Command, Output, Stdio};
 use std::result::Result;
@@ -24,9 +26,24 @@ enum ExitCode {
     CodeError,
 }
 
-impl Display for ExitCode{
+impl ExitCode {
+    pub fn iter() -> Zip<std::slice::Iter<'static, ExitCode>, RangeFrom<i32>> {
+        static CODE: [ExitCode; 7] = [
+            ExitCode::Ok,
+            ExitCode::ArgumentError,
+            ExitCode::LanguageError,
+            ExitCode::EditorError,
+            ExitCode::FileError,
+            ExitCode::RunnerError,
+            ExitCode::CodeError,
+        ];
+        CODE.iter().zip(ExitCode::Ok as i32..)
+    }
+}
+
+impl Display for ExitCode {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-       write!(f, "{:?}", self)
+        write!(f, "{:?}", self)
     }
 }
 
@@ -387,8 +404,9 @@ impl Runner {
     }
 }
 
-fn gen_epilog() -> &'static str {
-    "epilog"
+fn print_epilog() {
+    println!("Exit codes:");
+    ExitCode::iter().for_each(|code| println!("{:>5} : {:<5}", code.1, code.0));
 }
 
 #[derive(Clone, Debug)]
@@ -450,7 +468,7 @@ fn help(prog: &'static str, description: &'static str, args: Args) -> !{
     println!( "      --{:12}{}", args.compiler_args.long, args.compiler_args.help);
     println!( "      --{:12}{}\n", args.prog_args.long, args.prog_args.help);
 
-    println!("{}\n", gen_epilog());
+    print_epilog();
     exit(ExitCode::Ok as i32)
 }
 
