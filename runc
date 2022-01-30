@@ -72,6 +72,24 @@ def _runWasm(assembler: str, program: str, args: list[str], argv: list[str], fil
                   stdout=sp.PIPE, stderr=sp.PIPE)
 
 
+def _runAsm(assembler: str, asmOpts: list[str], linker: str, linkerOpts: list[str], args: list[str], argv: list[str], file: str, usedFiles: list[str]) -> sp.CompletedProcess[bytes]:
+    # FIXME: this is not portable
+    obj = os.path.join(tempfile.gettempdir(), "a.o")
+    prog = os.path.join(tempfile.gettempdir(), "a.out")
+    usedFiles.append(obj)
+    usedFiles.append(prog)
+    r = sp.run([assembler] + asmOpts + [obj, file] + args,
+               stdout=sp.PIPE, stderr=sp.PIPE)
+    if r.returncode != 0:
+        return r
+
+    r = sp.run([linker] + linkerOpts + [prog, obj],
+               stdout=sp.PIPE, stderr=sp.PIPE)
+    if r.returncode != 0:
+        return r
+    return sp.run([prog] + argv, stdout=sp.PIPE, stderr=sp.PIPE)
+
+
 class Runner:
 
     class LangT(TypedDict):
@@ -99,6 +117,27 @@ class Runner:
     _CACHE_NAME: Final[str] = "runc_cache"
 
     _snippets: dict[str, str] = {
+        "asm":
+        """global  _start
+
+%define     SYS_read        0
+%define   	SYS_write       1
+%define   	SYS_open        2
+%define   	SYS_close       3
+%define   	SYS_nanosleep   35
+%define   	SYS_exit        60
+%define   	SYS_wait4       61
+
+section .text
+_start:
+
+            mov         rax, SYS_exit
+            xor         rdi, rdi
+            syscall
+
+section .data
+section .bss
+""",
         "c":
         """#include <stdio.h>
 # include <math.h>
@@ -284,6 +323,7 @@ pub fn main() void {
 
     _lang: str
     _langs: LangsT = {
+        "asm":          {"runner": partial(_runAsm, "yasm", ["-felf64", "-o"], "ld", ["-o"]), "extension": ".asm", "req": ["yasm", "ld"]},
         "bash":         {"runner": partial(_runFile, "bash"), "extension": ".bash", "req": ["bash"]},
         "c":            {"runner": partial(_runGCC, "gcc", ["-lm", "-o"]), "extension": ".c", "req": ["gcc"]},
         "c++":          {"runner": partial(_runGCC, "g++", ["-lm", "-o"]), "extension": ".cpp", "req": ["g++"]},
@@ -323,6 +363,7 @@ pub fn main() void {
         "hs": "haskell",
         "js": "javascript",
         "ml": "ocaml",
+        "nasm": "asm",
         "pl": "perl",
         "purs": "purescript",
         "py": "python",
@@ -331,6 +372,7 @@ pub fn main() void {
         "scm": "scheme",
         "ts": "typescript",
         "wat": "wasm",
+        "yasm": "asm",
     }
 
     _editor: str

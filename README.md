@@ -38,33 +38,34 @@ Short for run code
 Most languages came from
 [here](https://madnight.github.io/githut/#/pull_requests/2021/3).
 
-| Status                  | Langauge     | Status   | Langauge   | Status          | Language  | Status     | Language          |
-|-------------------------|--------------|----------|------------|-----------------|-----------|------------|-------------------|
-| :ballot_box_with_check: | Bash         | :hammer: | Clojure    | :man_shrugging: | Coq       | :no_entry: | Emacs Lisp        |
-| :ballot_box_with_check: | C            | :hammer: | Dart       | :man_shrugging: | DM        | :no_entry: | F#                |
-| :ballot_box_with_check: | C#           | :hammer: | Elm        | :man_shrugging: | Elixir    | :no_entry: | Jsonnet           |
-| :ballot_box_with_check: | C++          | :hammer: | Groovy     | :man_shrugging: | Erlang    | :no_entry: | MATLAB            |
-| :ballot_box_with_check: | Cmake        | :hammer: | Kotlin     | :man_shrugging: | Julia     | :no_entry: | NASL              |
-| :ballot_box_with_check: | CoffeeScript | :hammer: | PowerShell | :man_shrugging: | Smalltalk | :no_entry: | Nix               |
-| :ballot_box_with_check: | D            | :hammer: | R          | :man_shrugging: | Crystal   | :no_entry: | Objective-C       |
-| :ballot_box_with_check: | Dash         | :hammer: | Vala       | :man_shrugging: | APL       | :no_entry: | Objective-C++     |
-| :ballot_box_with_check: | Fortran      |          |            |                 |           | :no_entry: | Puppet            |
-| :ballot_box_with_check: | Go           |          |            |                 |           | :no_entry: | Swift             |
-| :ballot_box_with_check: | Haskell      |          |            |                 |           | :no_entry: | SystemVerilog     |
-| :ballot_box_with_check: | Java         |          |            |                 |           | :no_entry: | Visual Basic .NET |
-| :ballot_box_with_check: | JavaScript   |          |            |                 |           | :no_entry: | TSQL              |
-| :ballot_box_with_check: | Lua          |          |            |                 |           | :no_entry: | Vim script        |
-| :ballot_box_with_check: | Ocaml        |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | Perl         |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | PHP          |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | PureScript   |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | Python       |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | Ruby         |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | Rust         |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | Shell        |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | Scala        |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | Scheme       |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | TypeScript   |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | WebAssembly  |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | Zig          |          |            |                 |           |            |                   |
-| :ballot_box_with_check: | Zsh          |          |            |                 |           |            |                   |
+| Status                  | Langauge        | Status   | Langauge   | Status          | Language  | Status     | Language          |
+|-------------------------|-----------------|----------|------------|-----------------|-----------|------------|-------------------|
+| :ballot_box_with_check: | Asm (nasm/yasm) | :hammer: | Clojure    | :man_shrugging: | Coq       | :no_entry: | Emacs Lisp        |
+| :ballot_box_with_check: | Bash            | :hammer: | Dart       | :man_shrugging: | DM        | :no_entry: | F#                |
+| :ballot_box_with_check: | C               | :hammer: | Elm        | :man_shrugging: | Elixir    | :no_entry: | Jsonnet           |
+| :ballot_box_with_check: | C#              | :hammer: | Groovy     | :man_shrugging: | Erlang    | :no_entry: | MATLAB            |
+| :ballot_box_with_check: | C++             | :hammer: | Kotlin     | :man_shrugging: | Julia     | :no_entry: | NASL              |
+| :ballot_box_with_check: | Cmake           | :hammer: | PowerShell | :man_shrugging: | Smalltalk | :no_entry: | Nix               |
+| :ballot_box_with_check: | CoffeeScript    | :hammer: | R          | :man_shrugging: | Crystal   | :no_entry: | Objective-C       |
+| :ballot_box_with_check: | D               | :hammer: | Vala       | :man_shrugging: | APL       | :no_entry: | Objective-C++     |
+| :ballot_box_with_check: | Dash            | :hammer: | V          |                 |           | :no_entry: | Puppet            |
+| :ballot_box_with_check: | Fortran         |          |            |                 |           | :no_entry: | Swift             |
+| :ballot_box_with_check: | Go              |          |            |                 |           | :no_entry: | SystemVerilog     |
+| :ballot_box_with_check: | Haskell         |          |            |                 |           | :no_entry: | Visual Basic .NET |
+| :ballot_box_with_check: | Java            |          |            |                 |           | :no_entry: | TSQL              |
+| :ballot_box_with_check: | JavaScript      |          |            |                 |           | :no_entry: | Vim script        |
+| :ballot_box_with_check: | Lua             |          |            |                 |           | :no_entry: |                   |
+| :ballot_box_with_check: | Ocaml           |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | Perl            |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | PHP             |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | PureScript      |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | Python          |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | Ruby            |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | Rust            |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | Shell           |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | Scala           |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | Scheme          |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | TypeScript      |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | WebAssembly     |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | Zig             |          |            |                 |           |            |                   |
+| :ballot_box_with_check: | Zsh             |          |            |                 |           |            |                   |
