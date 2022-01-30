@@ -285,8 +285,8 @@ pub fn main() void {
     _lang: str
     _langs: LangsT = {
         "bash":         {"runner": partial(_runFile, "bash"), "extension": ".bash", "req": ["bash"]},
-        "c":            {"runner": partial(_runGCC, "gcc", ["-lm", "-Og", "-o"]), "extension": ".c", "req": ["gcc"]},
-        "c++":          {"runner": partial(_runGCC, "g++", ["-lm", "-Og", "-o"]), "extension": ".cpp", "req": ["g++"]},
+        "c":            {"runner": partial(_runGCC, "gcc", ["-lm", "-o"]), "extension": ".c", "req": ["gcc"]},
+        "c++":          {"runner": partial(_runGCC, "g++", ["-lm", "-o"]), "extension": ".cpp", "req": ["g++"]},
         "c#":           {"runner": partial(_runCSC, "csc", ["/target:exe"], "mono"), "extension": ".cs", "req": ["mono", "csc"]},
         "cmake":        {"runner": partial(_runFile, ["cmake", "-P"]), "extension": ".cmake", "req": ["cmake"]},
         "coffeescript": {"runner": partial(_runFile, "coffee"), "extension": ".coffee", "req": ["coffee"]},
